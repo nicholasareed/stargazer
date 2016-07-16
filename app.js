@@ -170,30 +170,77 @@ var macInfo = {
 
     // 1
     '70:76:30:6A:AE:C5' : {
+        mac: '70:76:30:6A:AE:C5',
         connected: false,
         broadcasting: false,
         ip: '10.10.60.205',
-        name: 'Nick'
+        name: 'Nick',
+        channel: 0
     },
 
     // 2
     'B4:F2:E8:FD:73:92' : {
+        mac: 'B4:F2:E8:FD:73:92',
         connected: false,
         broadcasting: false,
         ip: '10.10.61.51',
-        name: 'Zane'
+        name: 'Zane',
+        channel: 0
     }
 
 };
+var macIds = {
+    1: '70:76:30:6A:AE:C5',
+    2: 'B4:F2:E8:FD:73:92'
+}
+
+var localIp = '10.10.60.148',
+    localPort = '4001',
+    localUrl = '/html/stb.html';
+
+Object.keys(macInfo).forEach(function(mac){
+    request({ 
+            method: 'GET', 
+            uri: 'http://' + macInfo[mac].ip + ':8080/itv/stopITV'
+        }
+        , function (error, response, body) {
+            console.log('Response');
+            if(response && response.statusCode == 200){
+                console.log('Stop on Launch');
+                console.log(body);
+            }
+
+            setTimeout(function(){
+
+                request({ 
+                        method: 'GET', 
+                        uri: 'http://' + macInfo[mac].ip + ':8080/itv/startURL?url=http://'+localIp + ':' + localPort + localUrl
+                    }
+                    , function (error, response, body) {
+                        if(response.statusCode == 200){
+                            console.log('Relaunch responded OK');
+                        } else {
+                            console.log('Failed Relaunch response status code');
+                        }
+                    }
+                );
+
+            },2000);
+        }
+    );
+});
 
 var macs = {},
-    macControl;
+    macControl = macIds[1];
+
+console.log('macControl:',macControl);
 
 // Define the message handler
 io.on('connection', function(socket) {
 
     console.log('Client connected');
     var mac = '';
+    var macChannel;
 
     function retryLaunch(){
 
@@ -227,10 +274,7 @@ io.on('connection', function(socket) {
 
     function relaunch(){
 
-        var stbIp = mac == mac1 ? mac1ip:mac2ip,
-            localIp = '10.10.60.148',
-            localPort = '4001',
-            localUrl = '/html/stb.html';
+        var stbIp = mac == mac1 ? mac1ip:mac2ip;
 
 
         request({ 
@@ -283,8 +327,9 @@ io.on('connection', function(socket) {
             macControl = mac;
         }
 
-        if(macControl == mac){
+        if(macControl == mac){ // && data.channel != macChannel){
             // broadcast out the channel we're on
+            macChannel = data.channel;
             console.log('CHANGING CHANNEL',data.channel);
             socket.broadcast.emit('channel',data.channel);
         }

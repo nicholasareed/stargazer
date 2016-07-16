@@ -2,12 +2,71 @@
     <head>
     <script src="/socket.io/socket.io.js"></script>
     <script src="jquery.js"></script>
+    <script src="lodash.js"></script>
     <script src="stb.js"></script>
 
     <style>
     	body {
-    		color: red;
+    		color: #4db6ac;
     	}
+
+    	#menu {
+    		position: absolute;
+    		right: 20px;;
+    		top: 200px;
+
+    		width: 400px;
+    		display: none;
+    	}
+
+    	.menu-item {
+    		background: white;
+    		color: black;
+    		padding: 20px;
+    		font-size: 24px;
+    		margin-bottom: 8px;
+    		text-align: right;
+    	}
+
+    	.menu-item.selected {
+    		background: #0d47a1;
+    	}
+
+    	.menu-item.selected.chosen {
+    		background: green;
+    	}
+
+    	#broadcast {
+    		position: absolute;
+
+    		top: 10px;
+    		right: 20px;
+
+    		width: 28px;
+    		height: 14px;
+/*
+    		border-radius: 50px;
+    		-webkit-border-radius: 50px;*/
+
+    		background: blue;
+    		border: 1px solid rgba(0,0,0,0.0);
+    	}
+    	#broadcast:not(.live) .isLive {
+    		display: none;
+    	}
+    	#broadcast.live {
+    		background: #d50000;
+    		border: 1px solid rgba(255,255,255,0.2);
+    	}
+    	#broadcast.live .isLive {
+    		display: inline-block;
+    		line-height: 14px;
+    		text-align: center;
+    		color: white;
+    		font-size: 11px;
+    		width: 100%;
+    	}
+
     </style>
 </head>
     <body onload="init()">
@@ -16,5 +75,19 @@
 	    	<h2 id="mac">mac:</h2>
 	    </div>
     	<h2 id="h2">channel:</h2>
+    	<div id="maccount" style="display:none;">Macs:</div>
+
+    	<!-- Broadcast icon -->
+    	<div id="broadcast" class="live">
+    		<div class="isLive">LIVE</div>
+    	</div>
+
+    	<!-- Menu -->
+    	<div id="menu">
+    		<!-- <div class="menu-item">
+    			Zane
+    		</div> -->
+    	</div>
+
     </body>
 </html>
